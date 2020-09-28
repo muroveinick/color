@@ -1,0 +1,32 @@
+input[type="file"] + label {
+  color: white;
+  font-family: monospace;
+  font-weight: 700;
+  border-radius: 2px;
+  background: red;
+  padding: 4px;
+  cursor: pointer;
+  display: inline-block;
+  /* pointer-events: none; */
+}
+input[type="file"] {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+
+input[type="file"]:focus + label {
+  outline: 2px solid rgb(177, 222, 236);
+  /* outline: -webkit-focus-ring-color auto 5px; */
+}
+
+img {
+  position: absolute;
+  top: 50px;
+  left: 50px;
+  max-width: 800px;
+  max-height: 800px;
+}

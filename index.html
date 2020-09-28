@@ -1,0 +1,51 @@
+<html>
+  <head>
+    <link href="style.css" type="text/css" rel="stylesheet" />
+  </head>
+  <body>
+    <input type="file" id="file" onchange="addImg(this.files)" />
+    <label for="file">upload</label>
+    <label>координаты:</label>
+    <span id="coord"></span>
+
+    <label> цвет hex:</label>
+    <span id="color"></span>
+
+    <br />
+    <img src="" />
+    <canvas id="canv"></canvas>
+  </body>
+  <script>
+    let data;
+    function addImg(a) {
+      let img = document.querySelector("img");
+      img.src = URL.createObjectURL(a[0]);
+      img.onload = () => calculate();
+    }
+
+    function calculate() {
+      let canv = document.getElementById("canv");
+      let img = document.querySelector("img");
+      canv.width = img.width;
+      canv.height = img.height;
+      let qqq = canv.getContext("2d");
+      qqq.drawImage(img, 10, 10, img.width, img.height);
+
+      img.style.visibility = "hidden";
+
+      data = qqq.getImageData(10, 10, 700, 400);
+      //   console.log(data);
+      canv.addEventListener("mousemove", (e) => {
+        showColor(qqq, e.offsetX, e.offsetY);
+      });
+    }
+
+    function showColor(context, x, y) {
+      let data = context.getImageData(x, y, 1, 1).data;
+      document.getElementById("coord").innerHTML = `${x}  ${y}`;
+      document.getElementById("color").innerHTML = `${data[0].toString(16)} ${data[1].toString(16)} ${data[2].toString(16)}`;
+      //   console.log(context.getImageData(x, y, 1, 1).data);
+      //   console.log(`${x}  ${y}`);
+    }
+  </script>
+</html>
