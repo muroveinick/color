@@ -3,17 +3,23 @@
     <link href="style.css" type="text/css" rel="stylesheet" />
   </head>
   <body>
-    <input type="file" id="file" onchange="addImg(this.files)" />
-    <label for="file">upload</label>
-    <label>координаты:</label>
-    <span id="coord"></span>
-
-    <label> цвет hex:</label>
-    <span id="color"></span>
-
-    <br />
-    <img src="" />
-    <canvas id="canv"></canvas>
+    <div class="main">
+      <div class="leftItem">
+        <input type="file" id="file" onchange="addImg(this.files)" />
+        <label for="file">upload</label>
+        <div class="colorData">
+          <label>координаты:</label>
+          <span id="coord"></span>
+          <label> цвет hex:</label>
+          <span id="color"></span>
+          <label> цвет rgba:</label>
+          <span id="rgba"></span>
+          <div id="output"></div>
+        </div>
+      </div>
+      <img src="" />
+      <canvas id="canv"></canvas>
+    </div>
   </body>
   <script>
     let data;
@@ -29,7 +35,7 @@
       canv.width = img.width;
       canv.height = img.height;
       let qqq = canv.getContext("2d");
-      qqq.drawImage(img, 10, 10, img.width, img.height);
+      qqq.drawImage(img, 0, 0, img.width, img.height);
 
       img.style.visibility = "hidden";
 
@@ -38,14 +44,22 @@
       canv.addEventListener("mousemove", (e) => {
         showColor(qqq, e.offsetX, e.offsetY);
       });
+      canv.addEventListener("click", (e) => {
+        showColor(qqq, e.offsetX, e.offsetY, true);
+      });
     }
 
-    function showColor(context, x, y) {
-      let data = context.getImageData(x, y, 1, 1).data;
+    function showColor(context, x, y, isClicked) {
+      let localData = context.getImageData(x, y, 1, 1).data;
+      // console.log(localData);
       document.getElementById("coord").innerHTML = `${x}  ${y}`;
-      document.getElementById("color").innerHTML = `${data[0].toString(16)} ${data[1].toString(16)} ${data[2].toString(16)}`;
-      //   console.log(context.getImageData(x, y, 1, 1).data);
-      //   console.log(`${x}  ${y}`);
+      document.getElementById("color").innerHTML = `${localData[0].toString(16)} ${localData[1].toString(16)} ${localData[2].toString(16)}`;
+      document.getElementById("rgba").innerHTML = `${localData[0]} ${localData[1]} ${localData[2]}`;
+      document.getElementById("output").style.backgroundColor = `#${localData[0].toString(16)}${localData[1].toString(16)}${localData[2].toString(16)}`;
+
+      if (isClicked) {
+        console.log(`#${localData[0].toString(16)}${localData[1].toString(16)}${localData[2].toString(16)}`);
+      }
     }
   </script>
 </html>

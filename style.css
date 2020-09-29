@@ -7,7 +7,7 @@ input[type="file"] + label {
   padding: 4px;
   cursor: pointer;
   display: inline-block;
-  /* pointer-events: none; */
+  width: max-content;
 }
 input[type="file"] {
   width: 0.1px;
@@ -20,7 +20,6 @@ input[type="file"] {
 
 input[type="file"]:focus + label {
   outline: 2px solid rgb(177, 222, 236);
-  /* outline: -webkit-focus-ring-color auto 5px; */
 }
 
 img {
@@ -29,4 +28,24 @@ img {
   left: 50px;
   max-width: 800px;
   max-height: 800px;
+}
+.leftItem {
+  display: inline-block;
+  width: 200px;
+  justify-content: start;
+  flex-direction: column;
+  height: 1000px;
+}
+#output {
+  width: 30px;
+  height: 30px;
+}
+.colorData {
+  position: sticky;
+  top: 10px;
+  display: flex;
+  flex-direction: column;
+}
+canvas {
+  border: 1px solid black;
 }
