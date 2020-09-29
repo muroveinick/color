@@ -36,7 +36,8 @@ img {
   flex-direction: column;
   height: 1000px;
 }
-#output {
+#output,
+#output2 {
   width: 30px;
   height: 30px;
 }
@@ -48,4 +49,9 @@ img {
 }
 canvas {
   border: 1px solid black;
+}
+.main {
+  display: flex;
+  flex-direction: row;
+  align-items: start;
 }

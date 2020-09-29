@@ -5,6 +5,7 @@
   <body>
     <div class="main">
       <div class="leftItem">
+        <button onclick="check()">arraydata</button>
         <input type="file" id="file" onchange="addImg(this.files)" />
         <label for="file">upload</label>
         <div class="colorData">
@@ -15,6 +16,7 @@
           <label> цвет rgba:</label>
           <span id="rgba"></span>
           <div id="output"></div>
+          <div id="output2"></div>
         </div>
       </div>
       <img src="" />
@@ -22,6 +24,7 @@
     </div>
   </body>
   <script>
+    let arrayData = ["1231"];
     let data;
     function addImg(a) {
       let img = document.querySelector("img");
@@ -40,7 +43,7 @@
       img.style.visibility = "hidden";
 
       data = qqq.getImageData(10, 10, 700, 400);
-      //   console.log(data);
+      getArrayOfColors(data.data);
       canv.addEventListener("mousemove", (e) => {
         showColor(qqq, e.offsetX, e.offsetY);
       });
@@ -51,15 +54,36 @@
 
     function showColor(context, x, y, isClicked) {
       let localData = context.getImageData(x, y, 1, 1).data;
-      // console.log(localData);
+      let rgbacolor = `${localData[0]} ${localData[1]} ${localData[2]}`;
+      let hexcolor = `${convertToHex(localData[0])}${convertToHex(localData[1])}${convertToHex(localData[2])}`;
+
       document.getElementById("coord").innerHTML = `${x}  ${y}`;
-      document.getElementById("color").innerHTML = `${localData[0].toString(16)} ${localData[1].toString(16)} ${localData[2].toString(16)}`;
-      document.getElementById("rgba").innerHTML = `${localData[0]} ${localData[1]} ${localData[2]}`;
-      document.getElementById("output").style.backgroundColor = `#${localData[0].toString(16)}${localData[1].toString(16)}${localData[2].toString(16)}`;
+      document.getElementById("color").innerHTML = hexcolor;
+      document.getElementById("rgba").innerHTML = rgbacolor;
+      document.getElementById("output").style.backgroundColor = `#${hexcolor}`;
+      document.getElementById("output2").style.backgroundColor = arrayData[y * data.width + x];
+
+      console.log(arrayData[y * data.width + x]);
 
       if (isClicked) {
-        console.log(`#${localData[0].toString(16)}${localData[1].toString(16)}${localData[2].toString(16)}`);
+        console.log(`#${hexcolor}`);
       }
+    }
+
+    function convertToHex(dec) {
+      let res = dec.toString(16);
+      return res.length === 2 ? res : `0${res}`;
+    }
+
+    function getArrayOfColors(array4) {
+      for (let i = 4; i < array4.length; i++) {
+        if (i % 4 === 0) {
+          arrayData.push(`${convertToHex(array4[i - 4])}${convertToHex(array4[i - 3])}${convertToHex(array4[i - 2])}`);
+        }
+      }
+    }
+    function check() {
+      console.log(arrayData);
     }
   </script>
 </html>
