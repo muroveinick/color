@@ -42,8 +42,9 @@
 
       img.style.visibility = "hidden";
 
-      data = qqq.getImageData(10, 10, 700, 400);
+      data = qqq.getImageData(0, 0, canv.width, canv.height);
       getArrayOfColors(data.data);
+
       canv.addEventListener("mousemove", (e) => {
         showColor(qqq, e.offsetX, e.offsetY);
       });
@@ -53,6 +54,8 @@
     }
 
     function showColor(context, x, y, isClicked) {
+      // console.log(data);
+
       let localData = context.getImageData(x, y, 1, 1).data;
       let rgbacolor = `${localData[0]} ${localData[1]} ${localData[2]}`;
       let hexcolor = `${convertToHex(localData[0])}${convertToHex(localData[1])}${convertToHex(localData[2])}`;
@@ -82,6 +85,7 @@
         }
       }
     }
+
     function check() {
       console.log(arrayData);
     }
