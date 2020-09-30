@@ -15,10 +15,11 @@
           <span id="color"></span>
           <label> цвет rgba:</label>
           <span id="rgba"></span>
-          <div id="output"></div>
-          <div id="output2"></div>
+          <div class="output0"></div>
+          <div class="output2"></div>
         </div>
       </div>
+      <div class="selectedColors"></div>
       <img src="" />
       <canvas id="canv"></canvas>
     </div>
@@ -63,13 +64,14 @@
       document.getElementById("coord").innerHTML = `${x}  ${y}`;
       document.getElementById("color").innerHTML = hexcolor;
       document.getElementById("rgba").innerHTML = rgbacolor;
-      document.getElementById("output").style.backgroundColor = `#${hexcolor}`;
-      document.getElementById("output2").style.backgroundColor = arrayData[y * data.width + x];
+      document.querySelector('[class="output0"]').style.backgroundColor = `#${hexcolor}`;
+      document.querySelector('[class="output2"]').style.backgroundColor = arrayData[y * data.width + x];
 
-      console.log(arrayData[y * data.width + x]);
+      // console.log(arrayData[y * data.width + x]);
 
       if (isClicked) {
         console.log(`#${hexcolor}`);
+        addPixel(x, y);
       }
     }
 
@@ -88,6 +90,10 @@
 
     function check() {
       console.log(arrayData);
+    }
+
+    function addPixel(x, y) {
+      document.querySelector('[class="selectedColors"]').insertAdjacentHTML("beforeend", `<div class="output" style="background-color: ${arrayData[y * data.width + x]}">`);
     }
   </script>
 </html>
