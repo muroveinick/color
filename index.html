@@ -5,9 +5,10 @@
   <body>
     <div class="main">
       <div class="leftItem">
-        <button onclick="check()">arraydata</button>
-        <input type="file" id="file" onchange="addImg(this.files)" />
+        <input type="file" id="file" onchange="uploadImage(this.files)" />
         <label for="file">upload</label>
+        <button disabled>calculate</button>
+        <button id="clear" disabled>clear</button>
         <div class="colorData">
           <label>координаты:</label>
           <span id="coord"></span>
@@ -15,7 +16,7 @@
           <span id="color"></span>
           <label> цвет rgba:</label>
           <span id="rgba"></span>
-          <div class="output0"></div>
+          <!-- <div class="output0"></div> -->
           <div class="output2"></div>
         </div>
       </div>
@@ -27,7 +28,8 @@
   <script>
     let arrayData = ["1231"];
     let data;
-    function addImg(a) {
+    addSquereWPickedColor.cur = 0;
+    function uploadImage(a) {
       let img = document.querySelector("img");
       img.src = URL.createObjectURL(a[0]);
       img.onload = () => calculate();
@@ -55,8 +57,6 @@
     }
 
     function showColor(context, x, y, isClicked) {
-      // console.log(data);
-
       let localData = context.getImageData(x, y, 1, 1).data;
       let rgbacolor = `${localData[0]} ${localData[1]} ${localData[2]}`;
       let hexcolor = `${convertToHex(localData[0])}${convertToHex(localData[1])}${convertToHex(localData[2])}`;
@@ -64,14 +64,14 @@
       document.getElementById("coord").innerHTML = `${x}  ${y}`;
       document.getElementById("color").innerHTML = hexcolor;
       document.getElementById("rgba").innerHTML = rgbacolor;
-      document.querySelector('[class="output0"]').style.backgroundColor = `#${hexcolor}`;
+      // document.querySelector('[class="output0"]').style.backgroundColor = `#${hexcolor}`;
       document.querySelector('[class="output2"]').style.backgroundColor = arrayData[y * data.width + x];
 
       // console.log(arrayData[y * data.width + x]);
 
       if (isClicked) {
-        console.log(`#${hexcolor}`);
-        addPixel(x, y);
+        // console.log(`#${hexcolor}`);
+        addSquereWPickedColor(x, y, true);
       }
     }
 
@@ -81,19 +81,65 @@
     }
 
     function getArrayOfColors(array4) {
-      for (let i = 4; i < array4.length; i++) {
+      for (let i = 8; i < array4.length - 4; i++) {
         if (i % 4 === 0) {
           arrayData.push(`${convertToHex(array4[i - 4])}${convertToHex(array4[i - 3])}${convertToHex(array4[i - 2])}`);
         }
       }
     }
 
-    function check() {
-      console.log(arrayData);
+    function addSquereWPickedColor(x, y, newPick) {
+      let currcol;
+      // console.log(addSquereWPickedColor.cur);
+      if (addSquereWPickedColor.cur > 1) return;
+      typeof arguments[0] == "string" ? (currcol = x) : (currcol = arrayData[y * data.width + x]);
+      document
+        .querySelector('[class="selectedColors"]')
+        .insertAdjacentHTML("beforeend", `<div class="output" style="background-color: #${currcol}">`);
+
+      if (newPick) {
+        addSquereWPickedColor.cur++;
+        let list = document.querySelectorAll('[class="output"]');
+        list[list.length - 1].addEventListener("click", () => {
+          addRangeOfCOlors(currcol);
+        });
+      }
     }
 
-    function addPixel(x, y) {
-      document.querySelector('[class="selectedColors"]').insertAdjacentHTML("beforeend", `<div class="output" style="background-color: ${arrayData[y * data.width + x]}">`);
+    function addRangeOfCOlors(color) {
+      lowerColor = "";
+      upperColor = "";
+
+      for (let i = 0; i < 6; i += 2) {
+        parseInt(`${color[i]}${color[i + 1]}`, 16) - 20 > 0
+          ? (lowerColor += convertToHex(parseInt(`${color[i]}${color[i + 1]}`, 16) - 20))
+          : (lowerColor += `00`);
+
+        parseInt(`${color[i]}${color[i + 1]}`, 16) + 20 < 255
+          ? (upperColor += convertToHex(parseInt(`${color[i]}${color[i + 1]}`, 16) + 20))
+          : (upperColor += `ff`);
+      }
+      // console.log(`low  ${lowerColor} up   ${upperColor}`);
+      addSquereWPickedColor(lowerColor, null, false);
+      addSquereWPickedColor(upperColor, null, false);
+      document.querySelector("button").onclick = () => {
+        redrawPixels(lowerColor, upperColor);
+      };
+    }
+
+    function redrawPixels(low, up) {
+      console.log(`${low}  ${up}`);
+      let percent = 0;
+      let canvas = document.getElementById("canv");
+      let ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#fd02bf";
+      for (let i = 0; i < arrayData.length; i++) {
+        if (arrayData[i] > low && arrayData[i] < up) {
+          ctx.fillRect(i % data.width, i / data.width, 1, 1);
+          percent++;
+        }
+      }
+      console.log((percent / arrayData.length) * 100);
     }
   </script>
 </html>

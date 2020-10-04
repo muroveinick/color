@@ -56,3 +56,28 @@ canvas {
   flex-direction: row;
   align-items: start;
 }
+.selectedColors {
+  width: 100px;
+}
+.output {
+  cursor: pointer;
+}
+button {
+  padding: 4px;
+  cursor: pointer;
+  font-family: monospace;
+  background: red;
+  border: none;
+  color: white;
+  margin: 2px;
+  display: block;
+  border-radius: 2px;
+  font-weight: 700;
+}
+button:disabled {
+  background: tomato;
+  cursor: default;
+}
+button:focus {
+  outline: 2px solid rgb(177, 222, 236);
+}
