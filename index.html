@@ -7,7 +7,7 @@
       <div class="leftItem">
         <input type="file" id="file" onchange="uploadImage(this.files)" />
         <label for="file">upload</label>
-        <button disabled>calculate</button>
+        <button id="calculate" disabled>calculate</button>
         <button id="clear" disabled>clear</button>
         <div class="colorData">
           <label>координаты:</label>
@@ -29,13 +29,14 @@
     let arrayData = ["1231"];
     let data;
     addSquereWPickedColor.cur = 0;
+
     function uploadImage(a) {
       let img = document.querySelector("img");
       img.src = URL.createObjectURL(a[0]);
-      img.onload = () => calculate();
+      img.onload = () => calculate(true);
     }
 
-    function calculate() {
+    function calculate(isFirstRender) {
       let canv = document.getElementById("canv");
       let img = document.querySelector("img");
       canv.width = img.width;
@@ -44,16 +45,17 @@
       qqq.drawImage(img, 0, 0, img.width, img.height);
 
       img.style.visibility = "hidden";
+      if (isFirstRender) {
+        data = qqq.getImageData(0, 0, canv.width, canv.height);
+        getArrayOfColors(data.data);
 
-      data = qqq.getImageData(0, 0, canv.width, canv.height);
-      getArrayOfColors(data.data);
-
-      canv.addEventListener("mousemove", (e) => {
-        showColor(qqq, e.offsetX, e.offsetY);
-      });
-      canv.addEventListener("click", (e) => {
-        showColor(qqq, e.offsetX, e.offsetY, true);
-      });
+        canv.addEventListener("mousemove", (e) => {
+          showColor(qqq, e.offsetX, e.offsetY);
+        });
+        canv.addEventListener("click", (e) => {
+          showColor(qqq, e.offsetX, e.offsetY, true);
+        });
+      }
     }
 
     function showColor(context, x, y, isClicked) {
@@ -93,38 +95,37 @@
       // console.log(addSquereWPickedColor.cur);
       if (addSquereWPickedColor.cur > 1) return;
       typeof arguments[0] == "string" ? (currcol = x) : (currcol = arrayData[y * data.width + x]);
-      document
-        .querySelector('[class="selectedColors"]')
-        .insertAdjacentHTML("beforeend", `<div class="output" style="background-color: #${currcol}">`);
+      document.querySelector('[class="selectedColors"]').insertAdjacentHTML("beforeend", `<div class="output" style="background-color: #${currcol}">`);
+      document.getElementById("clear").addEventListener("click", () => clearSelectedColors());
+      disableButtonById("clear", false);
 
       if (newPick) {
         addSquereWPickedColor.cur++;
         let list = document.querySelectorAll('[class="output"]');
         list[list.length - 1].addEventListener("click", () => {
-          addRangeOfCOlors(currcol);
+          addRangeSq(currcol);
         });
       }
     }
 
-    function addRangeOfCOlors(color) {
+    function addRangeSq(color) {
       lowerColor = "";
       upperColor = "";
 
       for (let i = 0; i < 6; i += 2) {
-        parseInt(`${color[i]}${color[i + 1]}`, 16) - 20 > 0
-          ? (lowerColor += convertToHex(parseInt(`${color[i]}${color[i + 1]}`, 16) - 20))
-          : (lowerColor += `00`);
+        parseInt(`${color[i]}${color[i + 1]}`, 16) - 20 > 0 ? (lowerColor += convertToHex(parseInt(`${color[i]}${color[i + 1]}`, 16) - 20)) : (lowerColor += `00`);
 
-        parseInt(`${color[i]}${color[i + 1]}`, 16) + 20 < 255
-          ? (upperColor += convertToHex(parseInt(`${color[i]}${color[i + 1]}`, 16) + 20))
-          : (upperColor += `ff`);
+        parseInt(`${color[i]}${color[i + 1]}`, 16) + 20 < 255 ? (upperColor += convertToHex(parseInt(`${color[i]}${color[i + 1]}`, 16) + 20)) : (upperColor += `ff`);
       }
       // console.log(`low  ${lowerColor} up   ${upperColor}`);
       addSquereWPickedColor(lowerColor, null, false);
       addSquereWPickedColor(upperColor, null, false);
-      document.querySelector("button").onclick = () => {
+
+      document.getElementById("calculate").addEventListener("click", () => {
         redrawPixels(lowerColor, upperColor);
-      };
+      });
+
+      disableButtonById("calculate", false);
     }
 
     function redrawPixels(low, up) {
@@ -133,6 +134,7 @@
       let canvas = document.getElementById("canv");
       let ctx = canvas.getContext("2d");
       ctx.fillStyle = "#fd02bf";
+
       for (let i = 0; i < arrayData.length; i++) {
         if (arrayData[i] > low && arrayData[i] < up) {
           ctx.fillRect(i % data.width, i / data.width, 1, 1);
@@ -140,6 +142,21 @@
         }
       }
       console.log((percent / arrayData.length) * 100);
+      disableButtonById("calculate", true);
+      redrawPixels.redrawed = true;
+    }
+
+    function clearSelectedColors() {
+      console.log("adas");
+      document.querySelector('[class="selectedColors"]').innerHTML = "";
+      disableButtonById("clear", true);
+      disableButtonById("calculate", true);
+      addSquereWPickedColor.cur = 0;
+      return redrawPixels.redrawed ? (calculate(false), (redrawPixels.redrawed = false)) : null;
+    }
+
+    function disableButtonById(name, state) {
+      document.getElementById(`${name}`).disabled = state;
     }
   </script>
 </html>

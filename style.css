@@ -8,6 +8,7 @@ input[type="file"] + label {
   cursor: pointer;
   display: inline-block;
   width: max-content;
+  margin: 0 2px;
 }
 input[type="file"] {
   width: 0.1px;
