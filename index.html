@@ -8,6 +8,7 @@
         <input type="file" id="file" onchange="uploadImage(this.files)" />
         <label for="file">upload</label>
         <button id="calculate" disabled>calculate</button>
+        <input id="delta" class="hidden" type="text" />
         <button id="clear" disabled>clear</button>
         <div class="colorData">
           <label>координаты:</label>
@@ -20,7 +21,9 @@
           <div class="output2"></div>
         </div>
       </div>
-      <div class="selectedColors"></div>
+      <div class="selectedColors">
+        <div id="rangeColors" class="hidden"></div>
+      </div>
       <img src="" />
       <canvas id="canv"></canvas>
     </div>
@@ -45,47 +48,37 @@
       qqq.drawImage(img, 0, 0, img.width, img.height);
 
       img.style.visibility = "hidden";
+
       if (isFirstRender) {
         data = qqq.getImageData(0, 0, canv.width, canv.height);
         getArrayOfColors(data.data);
 
         canv.addEventListener("mousemove", (e) => {
-          showColor(qqq, e.offsetX, e.offsetY);
+          showColor(e.offsetX, e.offsetY);
         });
         canv.addEventListener("click", (e) => {
-          showColor(qqq, e.offsetX, e.offsetY, true);
+          showColor(e.offsetX, e.offsetY, true);
+        });
+        document.getElementById("calculate").addEventListener("click", () => {
+          redrawPixels(setDelta.color);
         });
       }
     }
 
-    function showColor(context, x, y, isClicked) {
-      let localData = context.getImageData(x, y, 1, 1).data;
-      let rgbacolor = `${localData[0]} ${localData[1]} ${localData[2]}`;
-      let hexcolor = `${convertToHex(localData[0])}${convertToHex(localData[1])}${convertToHex(localData[2])}`;
-
+    function showColor(x, y, isClicked) {
       document.getElementById("coord").innerHTML = `${x}  ${y}`;
-      document.getElementById("color").innerHTML = hexcolor;
-      document.getElementById("rgba").innerHTML = rgbacolor;
-      // document.querySelector('[class="output0"]').style.backgroundColor = `#${hexcolor}`;
-      document.querySelector('[class="output2"]').style.backgroundColor = arrayData[y * data.width + x];
-
-      // console.log(arrayData[y * data.width + x]);
+      document.getElementById("rgba").innerHTML = arrayData[y * data.width + x];
+      document.querySelector('[class="output2"]').style.backgroundColor = `rgb(${arrayData[y * data.width + x]})`;
 
       if (isClicked) {
-        // console.log(`#${hexcolor}`);
         addSquereWPickedColor(x, y, true);
       }
-    }
-
-    function convertToHex(dec) {
-      let res = dec.toString(16);
-      return res.length === 2 ? res : `0${res}`;
     }
 
     function getArrayOfColors(array4) {
       for (let i = 8; i < array4.length - 4; i++) {
         if (i % 4 === 0) {
-          arrayData.push(`${convertToHex(array4[i - 4])}${convertToHex(array4[i - 3])}${convertToHex(array4[i - 2])}`);
+          arrayData.push(`${array4[i - 4]},${array4[i - 3]},${array4[i - 2]}`);
         }
       }
     }
@@ -93,65 +86,86 @@
     function addSquereWPickedColor(x, y, newPick) {
       let currcol;
       // console.log(addSquereWPickedColor.cur);
-      if (addSquereWPickedColor.cur > 1) return;
-      typeof arguments[0] == "string" ? (currcol = x) : (currcol = arrayData[y * data.width + x]);
-      document.querySelector('[class="selectedColors"]').insertAdjacentHTML("beforeend", `<div class="output" style="background-color: #${currcol}">`);
+      if (addSquereWPickedColor.cur > 2) return;
+      if (typeof arguments[0] == "string") {
+        currcol = x;
+        document.querySelector("#rangeColors").insertAdjacentHTML("beforeend", `<div class="output" style="background-color: rgb(${currcol})">`);
+      } else {
+        currcol = arrayData[y * data.width + x];
+        document.querySelector('[class="selectedColors"]').insertAdjacentHTML("beforeend", `<div class="output" style="background-color: rgb(${currcol})">`);
+      }
+
       document.getElementById("clear").addEventListener("click", () => clearSelectedColors());
       disableButtonById("clear", false);
 
       if (newPick) {
-        addSquereWPickedColor.cur++;
         let list = document.querySelectorAll('[class="output"]');
         list[list.length - 1].addEventListener("click", () => {
           addRangeSq(currcol);
         });
       }
+      addSquereWPickedColor.cur++;
     }
 
     function addRangeSq(color) {
       lowerColor = "";
       upperColor = "";
 
-      for (let i = 0; i < 6; i += 2) {
-        parseInt(`${color[i]}${color[i + 1]}`, 16) - 20 > 0 ? (lowerColor += convertToHex(parseInt(`${color[i]}${color[i + 1]}`, 16) - 20)) : (lowerColor += `00`);
-
-        parseInt(`${color[i]}${color[i + 1]}`, 16) + 20 < 255 ? (upperColor += convertToHex(parseInt(`${color[i]}${color[i + 1]}`, 16) + 20)) : (upperColor += `ff`);
+      for (let i of color.split(",")) {
+        +i - 20 > 0 ? (lowerColor += `${+i - 20},`) : (lowerColor += "0,");
+        +i + 20 < 255 ? (upperColor += `${+i + 20},`) : (upperColor += "255,");
       }
-      // console.log(`low  ${lowerColor} up   ${upperColor}`);
-      addSquereWPickedColor(lowerColor, null, false);
-      addSquereWPickedColor(upperColor, null, false);
 
-      document.getElementById("calculate").addEventListener("click", () => {
-        redrawPixels(lowerColor, upperColor);
-      });
+      addSquereWPickedColor(lowerColor.substring(0, lowerColor.length - 1), null, false);
+      addSquereWPickedColor(upperColor.substring(0, upperColor.length - 1), null, false);
+      document.querySelector("#rangeColors").classList.remove("hidden");
 
-      disableButtonById("calculate", false);
+      return setDelta(color);
     }
 
-    function redrawPixels(low, up) {
-      console.log(`${low}  ${up}`);
+    function setDelta(clr) {
+      document.querySelector("#delta").classList.remove("hidden");
+      disableButtonById("calculate", false);
+      setDelta.color = clr;
+    }
+
+    function redrawPixels(color) {
+      if (redrawPixels.redrawed) {
+        redrawPixels.redrawed = false;
+        calculate(false);
+      }
       let percent = 0;
       let canvas = document.getElementById("canv");
       let ctx = canvas.getContext("2d");
       ctx.fillStyle = "#fd02bf";
+      // let delta = document.querySelector("input#delta").value;
+      // console.log(delta);
+      let localInputColor = color.split(",");
 
       for (let i = 0; i < arrayData.length; i++) {
-        if (arrayData[i] > low && arrayData[i] < up) {
+        let currColor = arrayData[i].split(",");
+        if (
+          ((+currColor[0] - +localInputColor[0]) ** 2 + (+currColor[1] - +localInputColor[1]) ** 2 + (+currColor[2] - +localInputColor[2]) ** 2) ** 0.5 <
+          document.querySelector("input#delta").value
+        ) {
           ctx.fillRect(i % data.width, i / data.width, 1, 1);
           percent++;
         }
       }
       console.log((percent / arrayData.length) * 100);
-      disableButtonById("calculate", true);
+      // disableButtonById("calculate", true);
+
       redrawPixels.redrawed = true;
     }
 
     function clearSelectedColors() {
       console.log("adas");
-      document.querySelector('[class="selectedColors"]').innerHTML = "";
+      document.querySelector('[class="selectedColors"]').innerHTML = `<div id="rangeColors" class="hidden"></div>`;
+
       disableButtonById("clear", true);
       disableButtonById("calculate", true);
       addSquereWPickedColor.cur = 0;
+      document.querySelector("#delta").classList.add("hidden");
       return redrawPixels.redrawed ? (calculate(false), (redrawPixels.redrawed = false)) : null;
     }
 

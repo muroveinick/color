@@ -8,7 +8,7 @@ input[type="file"] + label {
   cursor: pointer;
   display: inline-block;
   width: max-content;
-  margin: 0 2px;
+  margin: 2px;
 }
 input[type="file"] {
   width: 0.1px;
@@ -80,5 +80,28 @@ button:disabled {
   cursor: default;
 }
 button:focus {
+  outline: 2px solid rgb(177, 222, 236);
+}
+.hidden {
+  visibility: hidden;
+  height: 0px;
+  padding: 0;
+  border: none;
+  transition: all ease- -out 0.5s;
+}
+
+input {
+  padding: 4px;
+  cursor: pointer;
+  font-family: monospace;
+  border: 1px solid #474744;
+  width: 80px;
+  margin: 2px;
+  display: block;
+  border-radius: 2px;
+  font-weight: 700;
+}
+
+input:focus {
   outline: 2px solid rgb(177, 222, 236);
 }
