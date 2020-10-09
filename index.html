@@ -13,17 +13,20 @@
         <div class="colorData">
           <label>координаты:</label>
           <span id="coord"></span>
-          <label> цвет hex:</label>
-          <span id="color"></span>
+
           <label> цвет rgba:</label>
           <span id="rgba"></span>
-          <!-- <div class="output0"></div> -->
+
           <div class="output2"></div>
         </div>
       </div>
-      <div class="selectedColors">
-        <div id="rangeColors" class="hidden"></div>
+
+      <div id="rangeColors" class="hidden selectedColors">
+        <div class="flex"> <input type="range" min="0" max="255" value="50" id="r" /> <label for="r">r</label></div>
+        <div class="flex"> <input type="range" min="0" max="255" value="50" id="g" /><label for="g">g</label></div>
+        <div class="flex"> <input type="range" min="0" max="255" value="50" id="b" /><label for="b">b</label></div>
       </div>
+
       <img src="" />
       <canvas id="canv"></canvas>
     </div>
@@ -92,9 +95,9 @@
         document.querySelector("#rangeColors").insertAdjacentHTML("beforeend", `<div class="output" style="background-color: rgb(${currcol})">`);
       } else {
         currcol = arrayData[y * data.width + x];
-        document.querySelector('[class="selectedColors"]').insertAdjacentHTML("beforeend", `<div class="output" style="background-color: rgb(${currcol})">`);
+        document.querySelector('[class*="selectedColors"]').insertAdjacentHTML("beforeend", `<div class="output" style="background-color: rgb(${currcol})">`);
       }
-
+      document.querySelector("#rangeColors").classList.remove("hidden");
       document.getElementById("clear").addEventListener("click", () => clearSelectedColors());
       disableButtonById("clear", false);
 
@@ -126,6 +129,12 @@
     function setDelta(clr) {
       document.querySelector("#delta").classList.remove("hidden");
       disableButtonById("calculate", false);
+      let res = {
+        color: clr,
+        r: 0,
+        g: 0,
+        b: 0,
+      };
       setDelta.color = clr;
     }
 
