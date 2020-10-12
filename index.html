@@ -21,18 +21,19 @@
         </div>
       </div>
 
-      <div id="rangeColors" class="hidden selectedColors">
-        <div class="flex"> <input type="range" min="0" max="255" value="50" id="r" /> <label for="r">r</label></div>
-        <div class="flex"> <input type="range" min="0" max="255" value="50" id="g" /><label for="g">g</label></div>
-        <div class="flex"> <input type="range" min="0" max="255" value="50" id="b" /><label for="b">b</label></div>
+      <div class="centeritem">
+        <img src="" />
+        <canvas id="canv"></canvas>
       </div>
-
-      <img src="" />
-      <canvas id="canv"></canvas>
+    </div>
+    <div class="hidden selectedColors">
+      <!-- <div class="flex"><input type="range" min="0" max="255" value="50" id="r" /><label for="r">r</label></div> -->
+      <!-- <div class="flex"><input type="range" min="0" max="255" value="50" id="g" /><label for="g">g</label></div> -->
+      <!-- <div class="flex"><input type="range" min="0" max="255" value="50" id="b" /><label for="b">b</label></div>   -->
     </div>
   </body>
   <script>
-    let arrayData = ["1231"];
+    let arrayData = [];
     let data;
     addSquereWPickedColor.cur = 0;
 
@@ -92,39 +93,42 @@
       if (addSquereWPickedColor.cur > 2) return;
       if (typeof arguments[0] == "string") {
         currcol = x;
-        document.querySelector("#rangeColors").insertAdjacentHTML("beforeend", `<div class="output" style="background-color: rgb(${currcol})">`);
       } else {
         currcol = arrayData[y * data.width + x];
-        document.querySelector('[class*="selectedColors"]').insertAdjacentHTML("beforeend", `<div class="output" style="background-color: rgb(${currcol})">`);
       }
-      document.querySelector("#rangeColors").classList.remove("hidden");
+      document
+        .querySelector('[class*="selectedColors"]')
+        .insertAdjacentHTML("beforeend", `<div class="output" style="background-color: rgb(${currcol})">`);
+
+      document.querySelector('[class*="selectedColors"]').classList.remove("hidden");
       document.getElementById("clear").addEventListener("click", () => clearSelectedColors());
       disableButtonById("clear", false);
 
       if (newPick) {
         let list = document.querySelectorAll('[class="output"]');
-        list[list.length - 1].addEventListener("click", () => {
-          addRangeSq(currcol);
-        });
+        // list[list.length - 1].addEventListener("click", () => {
+        //   addRangeSq(currcol);
+        // });
+        return setDelta(currcol);
       }
       addSquereWPickedColor.cur++;
     }
 
-    function addRangeSq(color) {
-      lowerColor = "";
-      upperColor = "";
+    // function addRangeSq(color) {
+    //   lowerColor = "";
+    //   upperColor = "";
 
-      for (let i of color.split(",")) {
-        +i - 20 > 0 ? (lowerColor += `${+i - 20},`) : (lowerColor += "0,");
-        +i + 20 < 255 ? (upperColor += `${+i + 20},`) : (upperColor += "255,");
-      }
+    //   for (let i of color.split(",")) {
+    //     +i - 20 > 0 ? (lowerColor += `${+i - 20},`) : (lowerColor += "0,");
+    //     +i + 20 < 255 ? (upperColor += `${+i + 20},`) : (upperColor += "255,");
+    //   }
 
-      addSquereWPickedColor(lowerColor.substring(0, lowerColor.length - 1), null, false);
-      addSquereWPickedColor(upperColor.substring(0, upperColor.length - 1), null, false);
-      document.querySelector("#rangeColors").classList.remove("hidden");
+    //   addSquereWPickedColor(lowerColor.substring(0, lowerColor.length - 1), null, false);
+    //   addSquereWPickedColor(upperColor.substring(0, upperColor.length - 1), null, false);
+    //   document.querySelector('[class*="selectedColors"]').classList.remove("hidden");
 
-      return setDelta(color);
-    }
+    //   return setDelta(color);
+    // }
 
     function setDelta(clr) {
       document.querySelector("#delta").classList.remove("hidden");
@@ -154,7 +158,8 @@
       for (let i = 0; i < arrayData.length; i++) {
         let currColor = arrayData[i].split(",");
         if (
-          ((+currColor[0] - +localInputColor[0]) ** 2 + (+currColor[1] - +localInputColor[1]) ** 2 + (+currColor[2] - +localInputColor[2]) ** 2) ** 0.5 <
+          ((+currColor[0] - +localInputColor[0]) ** 2 + (+currColor[1] - +localInputColor[1]) ** 2 + (+currColor[2] - +localInputColor[2]) ** 2) **
+            0.5 <
           document.querySelector("input#delta").value
         ) {
           ctx.fillRect(i % data.width, i / data.width, 1, 1);
@@ -169,12 +174,13 @@
 
     function clearSelectedColors() {
       console.log("adas");
-      document.querySelector('[class="selectedColors"]').innerHTML = `<div id="rangeColors" class="hidden"></div>`;
+      document.querySelector('[class*="selectedColors"]').innerHTML = ``;
 
       disableButtonById("clear", true);
       disableButtonById("calculate", true);
       addSquereWPickedColor.cur = 0;
       document.querySelector("#delta").classList.add("hidden");
+      document.querySelector('[class*="selectedColors"]').classList.add("hidden");
       return redrawPixels.redrawed ? (calculate(false), (redrawPixels.redrawed = false)) : null;
     }
 

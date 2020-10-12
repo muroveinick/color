@@ -39,7 +39,6 @@ img {
   width: 150px;
   justify-content: start;
   flex-direction: column;
-  height: 1000px;
 }
 [class*="output"] {
   width: 30px;
@@ -59,9 +58,10 @@ canvas {
 .main {
   display: flex;
   flex-direction: row;
-  align-items: start;
+  align-items: center;
   background: #e4e5e6;
   padding: 8px;
+  height: calc(100vh - 20px);
 }
 .selectedColors {
   width: 100px;
@@ -93,6 +93,7 @@ button:focus {
   height: 0px;
   padding: 0;
   border: none;
+  margin: 0;
   transition: all ease- -out 0.5s;
 }
 
