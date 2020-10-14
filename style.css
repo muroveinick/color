@@ -1,5 +1,7 @@
 body {
   margin: 0;
+  font-family: monospace;
+  font-weight: 700;
 }
 
 input[type="file"] + label {
