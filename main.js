@@ -1,4 +1,3 @@
-import * as variables from "./_var.js";
 let arrayData = [];
 let arrayOfColors = [];
 addSquereWPickedColor.cur = 0;
@@ -54,15 +53,13 @@ function getArrayOfColors(array4) {
 }
 
 function addSquereWPickedColor(x, y, newPick) {
-  let currcol;
-  // console.log(addSquereWPickedColor.cur);
   if (addSquereWPickedColor.cur > 2) return;
   if (typeof arguments[0] == "string") {
     currcol = x;
   } else {
     currcol = arrayData[y * data.width + x];
   }
-  document.querySelector('[class*="selectedColors"]').insertAdjacentHTML("beforeend", variables.colorObj);
+  document.querySelector('[class*="selectedColors"]').insertAdjacentHTML("beforeend", colorObj());
 
   document.querySelector('[class*="selectedColors"]').classList.remove("hidden");
   document.getElementById("clear").addEventListener("click", () => clearSelectedColors());
@@ -77,6 +74,7 @@ function addSquereWPickedColor(x, y, newPick) {
   }
   addSquereWPickedColor.cur++;
 }
+
 function setDelta(clr) {
   document.querySelector("#delta").classList.remove("hidden");
   disableButtonById("calculate", false);
@@ -88,12 +86,12 @@ function redrawPixels(color) {
     redrawPixels.redrawed = false;
     calculate(false);
   }
+
   let percent = 0;
   let canvas = document.getElementById("canv");
   let ctx = canvas.getContext("2d");
   ctx.fillStyle = "#fd02bf";
-  // let delta = document.querySelector("input#delta").value;
-  // console.log(delta);
+
   let localInputColor = color.split(",");
 
   for (let i = 0; i < arrayData.length; i++) {
