@@ -22,15 +22,10 @@ function calculate(isFirstRender) {
     data = qqq.getImageData(0, 0, canv.width, canv.height);
     getArrayOfColors(data.data);
 
-    canv.addEventListener("mousemove", (e) => {
-      showColor(e.offsetX, e.offsetY);
-    });
-    canv.addEventListener("click", (e) => {
-      showColor(e.offsetX, e.offsetY, true);
-    });
-    document.getElementById("calculate").addEventListener("click", () => {
-      redrawPixels(setDelta.color);
-    });
+    canv.addEventListener("mousemove", (e) => showColor(e.offsetX, e.offsetY));
+    canv.addEventListener("click", (e) => showColor(e.offsetX, e.offsetY, true));
+    document.getElementById("calculate").addEventListener("click", () => redrawPixels(setDelta()));
+    document.getElementById("clear").addEventListener("click", () => clearSelectedColors());
   }
 }
 
@@ -40,7 +35,7 @@ function showColor(x, y, isClicked) {
   document.querySelector('[class="output2"]').style.backgroundColor = `rgb(${arrayData[y * data.width + x]})`;
 
   if (isClicked) {
-    addSquereWPickedColor(x, y, true);
+    addSquereWPickedColor(x, y);
   }
 }
 
@@ -52,54 +47,44 @@ function getArrayOfColors(array4) {
   }
 }
 
-function addSquereWPickedColor(x, y, newPick) {
+function addSquereWPickedColor(x, y) {
   if (addSquereWPickedColor.cur > 2) return;
-  if (typeof arguments[0] == "string") {
-    currcol = x;
-  } else {
-    currcol = arrayData[y * data.width + x];
-  }
-  document.querySelector('[class*="selectedColors"]').insertAdjacentHTML("beforeend", colorObj());
 
+  currcol = arrayData[y * data.width + x];
+
+  document.querySelector('[class*="selectedColors"]').insertAdjacentHTML("beforeend", colorObj());
   document.querySelector('[class*="selectedColors"]').classList.remove("hidden");
-  document.getElementById("clear").addEventListener("click", () => clearSelectedColors());
+
   disableButtonById("clear", false);
 
-  if (newPick) {
-    let list = document.querySelectorAll('[class="output"]');
-    // list[list.length - 1].addEventListener("click", () => {
-    //   addRangeSq(currcol);
-    // });
-    return setDelta(currcol);
-  }
   addSquereWPickedColor.cur++;
+  return setDelta(currcol);
 }
 
 function setDelta(clr) {
   document.querySelector("#delta").classList.remove("hidden");
   disableButtonById("calculate", false);
-  setDelta.color = clr;
+
+  setDelta.data = new colorData(document.querySelector("input#delta").value, clr, document.querySelector("input#phaseNameInput").value);
+  return setDelta.data;
 }
 
-function redrawPixels(color) {
+function redrawPixels(obj) {
   if (redrawPixels.redrawed) {
     redrawPixels.redrawed = false;
     calculate(false);
   }
+
+  console.log(obj);
 
   let percent = 0;
   let canvas = document.getElementById("canv");
   let ctx = canvas.getContext("2d");
   ctx.fillStyle = "#fd02bf";
 
-  let localInputColor = color.split(",");
-
   for (let i = 0; i < arrayData.length; i++) {
     let currColor = arrayData[i].split(",");
-    if (
-      ((+currColor[0] - +localInputColor[0]) ** 2 + (+currColor[1] - +localInputColor[1]) ** 2 + (+currColor[2] - +localInputColor[2]) ** 2) ** 0.5 <
-      document.querySelector("input#delta").value
-    ) {
+    if (((+currColor[0] - +obj.colorArr[0]) ** 2 + (+currColor[1] - +obj.colorArr[1]) ** 2 + (+currColor[2] - +obj.colorArr[2]) ** 2) ** 0.5 < obj.delta) {
       ctx.fillRect(i % data.width, i / data.width, 1, 1);
       percent++;
     }
@@ -107,9 +92,10 @@ function redrawPixels(color) {
   document.getElementById("percent").innerHTML = ((percent / arrayData.length) * 100).toFixed(3);
   redrawPixels.redrawed = true;
   return arrayOfColors.push({
-    color: `${color}`,
+    color: obj.color,
     percent: `${(percent / arrayData.length) * 100}`,
-    name: "blank",
+    name: obj.phaseName,
+    delta: obj.delta,
   });
 }
 
