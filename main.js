@@ -24,7 +24,7 @@ function calculate(isFirstRender) {
     canv.addEventListener("click", (e) => showColor(e.offsetX, e.offsetY, true));
     document.getElementById("calculate").addEventListener("click", () => redrawPixels(0));
     document.getElementById("clear").addEventListener("click", () => clearSelectedColors());
-    dragndrop(document.querySelector('[class*="selectedColors"]'));
+    dragndrop(document.querySelector('[class*="dragheader"]'));
   }
 }
 function dragndrop(elem) {
@@ -44,8 +44,8 @@ function dragndrop(elem) {
   };
   function mousemove(e) {
     e.preventDefault();
-    elem.style.top = -coorddata.yNew + coorddata.yDef + e.clientY + "px";
-    elem.style.left = -coorddata.xNew + coorddata.xDef + e.clientX + "px";
+    selectedColors.style.top = -coorddata.yNew + coorddata.yDef + e.clientY + "px";
+    selectedColors.style.left = -coorddata.xNew + coorddata.xDef + e.clientX + "px";
   }
   function closedrag() {
     document.onmouseup = null;
@@ -78,9 +78,10 @@ function addSquereWPickedColor(x, y) {
 
   obj = new colorData(currcol, addSquereWPickedColor.cur);
 
-  document.querySelector('[class*="selectedColors"]').insertAdjacentHTML("beforeend", colorObj());
+  selectedColors.insertAdjacentHTML("beforeend", colorObj());
+  onDeleteRow(addSquereWPickedColor.cur);
 
-  document.querySelector('[class*="selectedColors"]').classList.remove("hidden");
+  selectedColors.classList.remove("hidden");
   document.querySelector("#delta").classList.remove("hidden");
   document.querySelector("#phaseNameInput").classList.remove("hidden");
 
@@ -118,18 +119,35 @@ function redrawPixels(i) {
 }
 
 function clearSelectedColors() {
-  document.querySelectorAll(".flex").forEach((i) => document.querySelector('[class*="selectedColors"]').removeChild(i));
+  document.querySelectorAll(".flex").forEach((i) => selectedColors.removeChild(i));
 
   disableButtonById("clear", true);
   disableButtonById("calculate", true);
   // addSquereWPickedColor.cur = 0;
   document.querySelector("#delta").classList.add("hidden");
   document.querySelector("#phaseNameInput").classList.add("hidden");
-  document.querySelector('[class*="selectedColors"]').classList.add("hidden");
+  selectedColors.classList.add("hidden");
 
   return redrawPixels.redrawed ? (calculate(false), (redrawPixels.redrawed = false)) : null;
 }
 
 function disableButtonById(name, state) {
   document.getElementById(`${name}`).disabled = state;
+}
+
+function onDeleteRow(index) {
+  selectedColors.lastChild.querySelector(".cancel").addEventListener("click", () => {
+    console.log(addSquereWPickedColor.cur);
+    arrayOfColors.splice(index, 1);
+    selectedColors.removeChild(selectedColors.lastChild);
+    addSquereWPickedColor.cur--;
+    if (addSquereWPickedColor.cur === 0) selectedColors.classList.add("hidden");
+  });
+
+  selectedColors.lastChild.addEventListener("click", () => {
+    // this.classList.add("fde");
+    // console.log(index);
+    selectedColors.children[index + 1].classList.toggle("selected");
+    // globalState.selectedRow = index + 1;
+  });
 }

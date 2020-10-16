@@ -118,8 +118,9 @@ input:focus {
   background-color: white;
   border-radius: 3px;
 }
-label {
-  vertical-align: sub;
+
+.selectedColors .selected {
+  background-color: #e2ecf6;
 }
 
 .flex {

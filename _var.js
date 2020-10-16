@@ -1,6 +1,6 @@
 let arrayData = [];
 let arrayOfColors = [];
-
+const selectedColors = document.querySelector('[class*="selectedColors"]');
 let currcol = "";
 let colorObj = () => `<div class="flex"> 
                        <div class="output" style="background-color: rgb(${currcol})"></div>
@@ -24,4 +24,7 @@ colorData = class {
     this.delta = delta;
     this.phaseName = phaseName;
   }
+};
+let globalState = {
+  selectedRow: 0,
 };
