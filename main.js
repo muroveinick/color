@@ -1,5 +1,3 @@
-let arrayData = [];
-let arrayOfColors = [];
 addSquereWPickedColor.cur = 0;
 
 function uploadImage(a) {
@@ -24,8 +22,34 @@ function calculate(isFirstRender) {
 
     canv.addEventListener("mousemove", (e) => showColor(e.offsetX, e.offsetY));
     canv.addEventListener("click", (e) => showColor(e.offsetX, e.offsetY, true));
-    document.getElementById("calculate").addEventListener("click", () => redrawPixels(setDelta()));
+    document.getElementById("calculate").addEventListener("click", () => redrawPixels(0));
     document.getElementById("clear").addEventListener("click", () => clearSelectedColors());
+    dragndrop(document.querySelector('[class*="selectedColors"]'));
+  }
+}
+function dragndrop(elem) {
+  let coorddata = {
+    xDef: 0,
+    yDef: 0,
+    xNew: 0,
+    yNew: 0,
+  };
+  elem.onmousedown = function mousedown(e) {
+    coorddata.xDef = elem.getBoundingClientRect().x;
+    coorddata.yDef = elem.getBoundingClientRect().y;
+    coorddata.xNew = e.clientX;
+    coorddata.yNew = e.clientY;
+    document.onmousemove = mousemove;
+    document.onmouseup = closedrag;
+  };
+  function mousemove(e) {
+    e.preventDefault();
+    elem.style.top = -coorddata.yNew + coorddata.yDef + e.clientY + "px";
+    elem.style.left = -coorddata.xNew + coorddata.xDef + e.clientX + "px";
+  }
+  function closedrag() {
+    document.onmouseup = null;
+    document.onmousemove = null;
   }
 }
 
@@ -52,62 +76,57 @@ function addSquereWPickedColor(x, y) {
 
   currcol = arrayData[y * data.width + x];
 
+  obj = new colorData(currcol, addSquereWPickedColor.cur);
+
   document.querySelector('[class*="selectedColors"]').insertAdjacentHTML("beforeend", colorObj());
+
   document.querySelector('[class*="selectedColors"]').classList.remove("hidden");
+  document.querySelector("#delta").classList.remove("hidden");
+  document.querySelector("#phaseNameInput").classList.remove("hidden");
 
   disableButtonById("clear", false);
-
-  addSquereWPickedColor.cur++;
-  return setDelta(currcol);
-}
-
-function setDelta(clr) {
-  document.querySelector("#delta").classList.remove("hidden");
   disableButtonById("calculate", false);
 
-  setDelta.data = new colorData(document.querySelector("input#delta").value, clr, document.querySelector("input#phaseNameInput").value);
-  return setDelta.data;
+  addSquereWPickedColor.cur++;
+  return arrayOfColors.push(obj);
 }
-
-function redrawPixels(obj) {
+//TODO передавать нужны индекс
+function redrawPixels(i) {
   if (redrawPixels.redrawed) {
     redrawPixels.redrawed = false;
     calculate(false);
   }
+  let variable = arrayOfColors[i];
 
-  console.log(obj);
+  variable.set(document.querySelector("input#delta").value, document.querySelector("input#phaseNameInput").value);
 
-  let percent = 0;
+  let count = 0;
   let canvas = document.getElementById("canv");
   let ctx = canvas.getContext("2d");
   ctx.fillStyle = "#fd02bf";
 
   for (let i = 0; i < arrayData.length; i++) {
     let currColor = arrayData[i].split(",");
-    if (((+currColor[0] - +obj.colorArr[0]) ** 2 + (+currColor[1] - +obj.colorArr[1]) ** 2 + (+currColor[2] - +obj.colorArr[2]) ** 2) ** 0.5 < obj.delta) {
+    if (((+currColor[0] - +variable.colorArr[0]) ** 2 + (+currColor[1] - +variable.colorArr[1]) ** 2 + (+currColor[2] - +variable.colorArr[2]) ** 2) ** 0.5 < variable.delta) {
       ctx.fillRect(i % data.width, i / data.width, 1, 1);
-      percent++;
+      count++;
     }
   }
-  document.getElementById("percent").innerHTML = ((percent / arrayData.length) * 100).toFixed(3);
+  variable.percent = (count / arrayData.length) * 100;
+  document.getElementById("percent").innerHTML = ((count / arrayData.length) * 100).toFixed(3);
   redrawPixels.redrawed = true;
-  return arrayOfColors.push({
-    color: obj.color,
-    percent: `${(percent / arrayData.length) * 100}`,
-    name: obj.phaseName,
-    delta: obj.delta,
-  });
 }
 
 function clearSelectedColors() {
-  console.log("adas");
-  document.querySelector('[class*="selectedColors"]').innerHTML = ``;
+  document.querySelectorAll(".flex").forEach((i) => document.querySelector('[class*="selectedColors"]').removeChild(i));
 
   disableButtonById("clear", true);
   disableButtonById("calculate", true);
-  addSquereWPickedColor.cur = 0;
+  // addSquereWPickedColor.cur = 0;
   document.querySelector("#delta").classList.add("hidden");
+  document.querySelector("#phaseNameInput").classList.add("hidden");
   document.querySelector('[class*="selectedColors"]').classList.add("hidden");
+
   return redrawPixels.redrawed ? (calculate(false), (redrawPixels.redrawed = false)) : null;
 }
 

@@ -13,8 +13,8 @@
         <input type="file" id="file" onchange="uploadImage(this.files)" />
         <label for="file">upload</label>
         <button id="calculate" disabled>calculate</button>
-        <input id="delta" class="hidden" type="text" placeholder="Разбос" />
-        <input id="phaseNameInput" class="hidden" type="text" placeholder="Название фазы" />
+        <input id="delta" class="hidden" type="text" placeholder="Разбос" autocomplete="off" />
+        <input id="phaseNameInput" class="hidden" type="text" placeholder="Название фазы" autocomplete="off" />
         <button id="clear" disabled>clear</button>
         <div class="colorData">
           <label>координаты:</label>
@@ -33,6 +33,7 @@
       </div>
     </div>
     <div class="hidden selectedColors">
+      <div class="dragheader">Выбранные цвета</div>
       <!-- <div class="flex"><input type="range" min="0" max="255" value="50" id="r" /><label for="r">r</label></div> -->
       <!-- <div class="flex"><input type="range" min="0" max="255" value="50" id="g" /><label for="g">g</label></div> -->
       <!-- <div class="flex"><input type="range" min="0" max="255" value="50" id="b" /><label for="b">b</label></div>   -->
