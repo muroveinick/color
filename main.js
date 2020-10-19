@@ -22,11 +22,12 @@ function calculate(isFirstRender) {
 
     canv.addEventListener("mousemove", (e) => showColor(e.offsetX, e.offsetY));
     canv.addEventListener("click", (e) => showColor(e.offsetX, e.offsetY, true));
-    document.getElementById("calculate").addEventListener("click", () => redrawPixels(0));
+    document.getElementById("calculate").addEventListener("click", () => redrawPixels(globalState.selectedRow));
     document.getElementById("clear").addEventListener("click", () => clearSelectedColors());
     dragndrop(document.querySelector('[class*="dragheader"]'));
   }
 }
+
 function dragndrop(elem) {
   let coorddata = {
     xDef: 0,
@@ -44,8 +45,8 @@ function dragndrop(elem) {
   };
   function mousemove(e) {
     e.preventDefault();
-    selectedColors.style.top = -coorddata.yNew + coorddata.yDef + e.clientY + "px";
-    selectedColors.style.left = -coorddata.xNew + coorddata.xDef + e.clientX + "px";
+    document.querySelector(".drag").style.top = -coorddata.yNew + coorddata.yDef + e.clientY + "px";
+    document.querySelector(".drag").style.left = -coorddata.xNew + coorddata.xDef + e.clientX + "px";
   }
   function closedrag() {
     document.onmouseup = null;
@@ -74,12 +75,12 @@ function getArrayOfColors(array4) {
 function addSquereWPickedColor(x, y) {
   if (addSquereWPickedColor.cur > 2) return;
 
-  currcol = arrayData[y * data.width + x];
+  arrayOfColors.push(new colorData(arrayData[y * data.width + x], addSquereWPickedColor.cur));
+  // document.querySelectorAll(".flex").forEach((i) => selectedColors.removeChild(i));
+  // selectedColors.innerHTML = "";
 
-  obj = new colorData(currcol, addSquereWPickedColor.cur);
-
-  selectedColors.insertAdjacentHTML("beforeend", colorObj());
-  onDeleteRow(addSquereWPickedColor.cur);
+  // arrayOfColors.forEach((i) => selectedColors.insertAdjacentHTML("beforeend", colorObj(i)));
+  onDeleteRow();
 
   selectedColors.classList.remove("hidden");
   document.querySelector("#delta").classList.remove("hidden");
@@ -89,18 +90,20 @@ function addSquereWPickedColor(x, y) {
   disableButtonById("calculate", false);
 
   addSquereWPickedColor.cur++;
-  return arrayOfColors.push(obj);
+  // return onDeleteRow();
 }
+
 //TODO передавать нужны индекс
-function redrawPixels(i) {
+function redrawPixels(index) {
   if (redrawPixels.redrawed) {
     redrawPixels.redrawed = false;
     calculate(false);
   }
-  let variable = arrayOfColors[i];
 
+  console.log(globalState.selectedRow);
+  let variable = arrayOfColors[index];
   variable.set(document.querySelector("input#delta").value, document.querySelector("input#phaseNameInput").value);
-
+  console.log(globalState.selectedRow);
   let count = 0;
   let canvas = document.getElementById("canv");
   let ctx = canvas.getContext("2d");
@@ -114,19 +117,18 @@ function redrawPixels(i) {
     }
   }
   variable.percent = (count / arrayData.length) * 100;
-  document.getElementById("percent").innerHTML = ((count / arrayData.length) * 100).toFixed(3);
+  selectedColors.children[index + 1].querySelector("#percent").innerHTML = ((count / arrayData.length) * 100).toFixed(3);
+  selectedColors.children[index + 1].querySelector("#phaseName").innerHTML = variable.phaseName;
   redrawPixels.redrawed = true;
 }
 
 function clearSelectedColors() {
-  document.querySelectorAll(".flex").forEach((i) => selectedColors.removeChild(i));
-
   disableButtonById("clear", true);
   disableButtonById("calculate", true);
   // addSquereWPickedColor.cur = 0;
   document.querySelector("#delta").classList.add("hidden");
   document.querySelector("#phaseNameInput").classList.add("hidden");
-  selectedColors.classList.add("hidden");
+  document.querySelector(".drag").classList.add("hidden");
 
   return redrawPixels.redrawed ? (calculate(false), (redrawPixels.redrawed = false)) : null;
 }
@@ -135,19 +137,29 @@ function disableButtonById(name, state) {
   document.getElementById(`${name}`).disabled = state;
 }
 
-function onDeleteRow(index) {
-  selectedColors.lastChild.querySelector(".cancel").addEventListener("click", () => {
-    console.log(addSquereWPickedColor.cur);
-    arrayOfColors.splice(index, 1);
-    selectedColors.removeChild(selectedColors.lastChild);
-    addSquereWPickedColor.cur--;
-    if (addSquereWPickedColor.cur === 0) selectedColors.classList.add("hidden");
-  });
+function onDeleteRow() {
+  HTMLCollection.prototype.forEach = Array.prototype.forEach;
 
-  selectedColors.lastChild.addEventListener("click", () => {
-    // this.classList.add("fde");
-    // console.log(index);
-    selectedColors.children[index + 1].classList.toggle("selected");
-    // globalState.selectedRow = index + 1;
+  ///////перерисовываем выбранные точки
+  selectedColors.innerHTML = "";
+  arrayOfColors.forEach((i) => selectedColors.insertAdjacentHTML("beforeend", colorObj(i)));
+
+  selectedColors.children.forEach((i, j) => {
+    ///на кнопку x
+    i.querySelector(".cancel").addEventListener("click", () => {
+      arrayOfColors.splice(j, 1);
+      selectedColors.removeChild(i);
+      addSquereWPickedColor.cur--;
+      if (addSquereWPickedColor.cur === 0) document.querySelector(".drag").classList.add("hidden");
+      return onDeleteRow();
+    });
+    ///на сам ряд
+    i.addEventListener("click", () => {
+      selectedColors.children.forEach((k) => (k.classList.contains("selected") ? k.classList.remove("selected") : null));
+
+      i.classList.toggle("selected");
+      console.log(j);
+      globalState.selectedRow = j;
+    });
   });
 }
