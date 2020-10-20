@@ -1,9 +1,8 @@
-addSquereWPickedColor.cur = 0;
-
 function uploadImage(a) {
   let img = document.querySelector("img");
   img.src = URL.createObjectURL(a[0]);
   img.onload = () => calculate(true);
+  document.querySelector('label[for="file"]').classList.add("hidden");
 }
 
 function calculate(isFirstRender) {
@@ -45,8 +44,8 @@ function dragndrop(elem) {
   };
   function mousemove(e) {
     e.preventDefault();
-    document.querySelector(".drag").style.top = -coorddata.yNew + coorddata.yDef + e.clientY + "px";
-    document.querySelector(".drag").style.left = -coorddata.xNew + coorddata.xDef + e.clientX + "px";
+    drag.style.top = -coorddata.yNew + coorddata.yDef + e.clientY + "px";
+    drag.style.left = -coorddata.xNew + coorddata.xDef + e.clientX + "px";
   }
   function closedrag() {
     document.onmouseup = null;
@@ -73,27 +72,20 @@ function getArrayOfColors(array4) {
 }
 
 function addSquereWPickedColor(x, y) {
-  if (addSquereWPickedColor.cur > 2) return;
+  if (globalState.rowCount > 2) return;
 
-  arrayOfColors.push(new colorData(arrayData[y * data.width + x], addSquereWPickedColor.cur));
-  // document.querySelectorAll(".flex").forEach((i) => selectedColors.removeChild(i));
-  // selectedColors.innerHTML = "";
-
-  // arrayOfColors.forEach((i) => selectedColors.insertAdjacentHTML("beforeend", colorObj(i)));
+  arrayOfColors.push(new colorData(arrayData[y * data.width + x], globalState.rowCount));
+  globalState.rowCount++;
   onDeleteRow();
 
-  selectedColors.classList.remove("hidden");
+  drag.classList.remove("hidden");
   document.querySelector("#delta").classList.remove("hidden");
   document.querySelector("#phaseNameInput").classList.remove("hidden");
 
   disableButtonById("clear", false);
   disableButtonById("calculate", false);
-
-  addSquereWPickedColor.cur++;
-  // return onDeleteRow();
 }
 
-//TODO передавать нужны индекс
 function redrawPixels(index) {
   if (redrawPixels.redrawed) {
     redrawPixels.redrawed = false;
@@ -117,18 +109,17 @@ function redrawPixels(index) {
     }
   }
   variable.percent = (count / arrayData.length) * 100;
-  selectedColors.children[index + 1].querySelector("#percent").innerHTML = ((count / arrayData.length) * 100).toFixed(3);
-  selectedColors.children[index + 1].querySelector("#phaseName").innerHTML = variable.phaseName;
+  selectedColors.children[index].querySelector("#percent").innerHTML = ((count / arrayData.length) * 100).toFixed(3);
+  selectedColors.children[index].querySelector("#phaseName").innerHTML = variable.phaseName;
   redrawPixels.redrawed = true;
 }
 
 function clearSelectedColors() {
   disableButtonById("clear", true);
   disableButtonById("calculate", true);
-  // addSquereWPickedColor.cur = 0;
   document.querySelector("#delta").classList.add("hidden");
   document.querySelector("#phaseNameInput").classList.add("hidden");
-  document.querySelector(".drag").classList.add("hidden");
+  drag.classList.add("hidden");
 
   return redrawPixels.redrawed ? (calculate(false), (redrawPixels.redrawed = false)) : null;
 }
@@ -143,23 +134,29 @@ function onDeleteRow() {
   ///////перерисовываем выбранные точки
   selectedColors.innerHTML = "";
   arrayOfColors.forEach((i) => selectedColors.insertAdjacentHTML("beforeend", colorObj(i)));
+  if (globalState.rowCount) drag.classList.remove("hidden");
 
   selectedColors.children.forEach((i, j) => {
     ///на кнопку x
     i.querySelector(".cancel").addEventListener("click", () => {
-      arrayOfColors.splice(j, 1);
-      selectedColors.removeChild(i);
-      addSquereWPickedColor.cur--;
-      if (addSquereWPickedColor.cur === 0) document.querySelector(".drag").classList.add("hidden");
-      return onDeleteRow();
+      let res = confirm("удалить?");
+      if (res) {
+        arrayOfColors.splice(j, 1);
+        selectedColors.removeChild(i);
+        globalState.rowCount--;
+        console.log(globalState.rowCount);
+        if (globalState.rowCount == 0) drag.classList.add("hidden");
+        onDeleteRow();
+      }
     });
     ///на сам ряд
     i.addEventListener("click", () => {
       selectedColors.children.forEach((k) => (k.classList.contains("selected") ? k.classList.remove("selected") : null));
-
       i.classList.toggle("selected");
-      console.log(j);
       globalState.selectedRow = j;
+
+      document.querySelector("#delta").value = arrayOfColors[j].delta || 0;
+      document.querySelector("#phaseNameInput").value = arrayOfColors[j].phaseName || "";
     });
   });
 }

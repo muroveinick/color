@@ -89,9 +89,9 @@ button:focus {
 .hidden {
   visibility: hidden;
   height: 0px;
-  padding: 0;
+  padding: 0 !important;
   border: none;
-  margin: 0;
+  margin: 0 !important;
   transition: all ease- -out 0.5s;
   line-height: 0;
 }
@@ -129,6 +129,16 @@ input:focus {
   justify-content: space-around;
   align-items: center;
   gap: 5px;
+}
+.flex *:nth-child(3) {
+  background-color: aqua;
+  /* flex: 0 1 50px; */
+  width: 50px;
+}
+.flex *:nth-child(5) {
+  background-color: aqua;
+
+  flex: 1 1 70px;
 }
 
 .dragheader {

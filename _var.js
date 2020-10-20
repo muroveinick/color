@@ -1,14 +1,17 @@
 let arrayData = [];
 let arrayOfColors = [];
 const selectedColors = document.querySelector('[class*="selectedColors"]');
+const drag = document.querySelector(".drag");
 
 let colorObj = (obj) => `<div class="flex"> 
                             <div class="output" style="background-color: rgb(${obj.color})"></div>
                             <label>Цвета, %: </label>
-                            <span id="percent" style="min-width: 20px">${obj.percent}</span>
+                            <span id="percent">${obj.percent.toFixed(3)}</span>
                             <label>Название: </label>
                             <span id="phaseName" style="min-width: 20px">${obj.phaseName}</span>
-                            <button class="ok">OK</button>
+                            <label>Разброс: </label>
+                            <span id="phaseName" style="min-width: 20px">${obj.delta}</span>
+                           <!-- <button class="ok">OK</button> -->
                             <button class="cancel">X</button>
                           </div>`;
 colorData = class {
@@ -27,4 +30,5 @@ colorData = class {
 };
 let globalState = {
   selectedRow: 0,
+  rowCount: 0,
 };
