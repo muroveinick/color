@@ -5,14 +5,14 @@ const drag = document.querySelector(".drag");
 
 let colorObj = (obj) => `<div class="flex"> 
                             <div class="output" style="background-color: rgb(${obj.color})"></div>
-                            <label>Цвета, %: </label>
+                            <label>Цвета,&nbsp;%: </label>
                             <span id="percent">${obj.percent.toFixed(3)}</span>
                             <label>Название: </label>
                             <span id="phaseName" style="min-width: 20px">${obj.phaseName}</span>
                             <label>Разброс: </label>
                             <span id="phaseName" style="min-width: 20px">${obj.delta}</span>
-                           <!-- <button class="ok">OK</button> -->
-                            <button class="cancel">X</button>
+                            <button style="font-size: 12px;" class="edit">&#9998;</button>
+                            <button style="background: red" class="cancel">&#215;</button>
                           </div>`;
 colorData = class {
   constructor(color, id) {

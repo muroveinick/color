@@ -71,19 +71,22 @@ function getArrayOfColors(array4) {
   }
 }
 
-function addSquereWPickedColor(x, y) {
-  if (globalState.rowCount > 2) return;
-
-  arrayOfColors.push(new colorData(arrayData[y * data.width + x], globalState.rowCount));
-  globalState.rowCount++;
-  onDeleteRow();
-
+function enableContolsOnInput() {
   drag.classList.remove("hidden");
   document.querySelector("#delta").classList.remove("hidden");
   document.querySelector("#phaseNameInput").classList.remove("hidden");
 
   disableButtonById("clear", false);
   disableButtonById("calculate", false);
+}
+
+function addSquereWPickedColor(x, y) {
+  if (globalState.rowCount > 2) return;
+
+  arrayOfColors.push(new colorData(arrayData[y * data.width + x], globalState.rowCount));
+  globalState.rowCount++;
+  onCreateRow();
+  enableContolsOnInput();
 }
 
 function redrawPixels(index) {
@@ -128,7 +131,7 @@ function disableButtonById(name, state) {
   document.getElementById(`${name}`).disabled = state;
 }
 
-function onDeleteRow() {
+function onCreateRow() {
   HTMLCollection.prototype.forEach = Array.prototype.forEach;
 
   ///////перерисовываем выбранные точки
@@ -146,9 +149,14 @@ function onDeleteRow() {
         globalState.rowCount--;
         // console.log(globalState.rowCount);
         if (globalState.rowCount == 0) drag.classList.add("hidden");
-        onDeleteRow();
+        onCreateRow();
       }
     });
+
+    i.querySelector(".edit").addEventListener("click", () => {
+      enableContolsOnInput();
+    });
+
     ///на сам ряд
     i.addEventListener("click", () => {
       selectedColors.children.forEach((k) => (k.classList.contains("selected") ? k.classList.remove("selected") : null));

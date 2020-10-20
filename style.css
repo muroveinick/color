@@ -1,20 +1,32 @@
+* {
+  --primaty-color: #3f6bc0;
+}
+
 body {
   margin: 0;
   font-family: monospace;
   font-weight: 700;
+  overflow: auto;
+}
+
+.header {
+  width: 100%;
+  height: 20px;
+  background-color: rebeccapurple;
 }
 
 input[type="file"] + label {
   color: white;
   font-family: monospace;
   font-weight: 700;
+  font-size: 14px;
   border-radius: 2px;
-  background: red;
+  background: var(--primaty-color);
   padding: 4px;
   cursor: pointer;
   display: inline-block;
   width: max-content;
-  margin: 2px;
+  margin: 2px 0;
 }
 input[type="file"] {
   width: 0.1px;
@@ -55,15 +67,14 @@ img {
   display: flex;
   flex-direction: column;
 }
-canvas {
-  border: 1px solid black;
-}
+
 .main {
   display: flex;
   flex-direction: row;
   align-items: center;
   background: #e4e5e6;
   padding: 8px;
+
   height: calc(100vh - 20px);
 }
 
@@ -71,16 +82,17 @@ button {
   padding: 4px;
   cursor: pointer;
   font-family: monospace;
-  background: red;
+  background: var(--primaty-color);
   border: none;
   color: white;
-  margin: 2px;
+  margin: 2px 0;
   display: block;
   border-radius: 2px;
   font-weight: 700;
+  font-size: 14px;
 }
 button:disabled {
-  background: tomato;
+  filter: grayscale(50%) brightness(1.3);
   cursor: default;
 }
 button:focus {
@@ -101,7 +113,7 @@ input {
   cursor: pointer;
   font-family: monospace;
   border: 1px solid #474744;
-  margin: 2px;
+  margin: 2px 0;
   border-radius: 2px;
   font-weight: 700;
 }
@@ -120,6 +132,14 @@ input:focus {
   border-radius: 3px;
 }
 
+.dragheader {
+  padding: 10px;
+  text-align: center;
+  cursor: move;
+  color: white;
+  background-color: #2196f3;
+}
+
 .selectedColors .selected {
   background-color: #e2ecf6;
 }
@@ -130,6 +150,9 @@ input:focus {
   align-items: center;
   gap: 5px;
 }
+.flex *{
+  flex-shrink: 0;
+}
 .flex *:nth-child(3) {
   background-color: aqua;
   /* flex: 0 1 50px; */
@@ -137,14 +160,9 @@ input:focus {
 }
 .flex *:nth-child(5) {
   background-color: aqua;
-
   flex: 1 1 70px;
 }
 
-.dragheader {
-  padding: 10px;
-  text-align: center;
-  cursor: move;
-  color: white;
-  background-color: #2196f3;
+.selectedColors{
+  padding: 2px;
 }
