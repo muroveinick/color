@@ -144,7 +144,7 @@ function onDeleteRow() {
         arrayOfColors.splice(j, 1);
         selectedColors.removeChild(i);
         globalState.rowCount--;
-        console.log(globalState.rowCount);
+        // console.log(globalState.rowCount);
         if (globalState.rowCount == 0) drag.classList.add("hidden");
         onDeleteRow();
       }
