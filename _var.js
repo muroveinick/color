@@ -6,7 +6,7 @@ const drag = document.querySelector(".drag");
 let colorObj = (obj) => `<div class="flex"> 
                             <div class="output" style="background-color: rgb(${obj.color})"></div>
                             <label>Цвета,&nbsp;%: </label>
-                            <span id="percent">${obj.percent.toFixed(3)}</span>
+                            <span id="percent">${obj.percent}</span>
                             <label>Название: </label>
                             <span id="phaseName" style="min-width: 20px">${obj.phaseName}</span>
                             <label>Разброс: </label>
