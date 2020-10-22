@@ -81,7 +81,7 @@ function enableContolsOnInput() {
 }
 
 function addSquereWPickedColor(x, y) {
-  if (globalState.rowCount > 2) return;
+  // if (globalState.rowCount > 2) return;
 
   arrayOfColors.push(new colorData(arrayData[y * data.width + x], globalState.rowCount));
   globalState.rowCount++;
@@ -106,13 +106,17 @@ function redrawPixels(index) {
 
   for (let i = 0; i < arrayData.length; i++) {
     let currColor = arrayData[i].split(",");
-    if (((+currColor[0] - +variable.colorArr[0]) ** 2 + (+currColor[1] - +variable.colorArr[1]) ** 2 + (+currColor[2] - +variable.colorArr[2]) ** 2) ** 0.5 < variable.delta) {
+    if (
+      ((+currColor[0] - +variable.colorArr[0]) ** 2 + (+currColor[1] - +variable.colorArr[1]) ** 2 + (+currColor[2] - +variable.colorArr[2]) ** 2) **
+        0.5 <
+      variable.delta
+    ) {
       ctx.fillRect(i % data.width, i / data.width, 1, 1);
       count++;
     }
   }
-  variable.percent = (count / arrayData.length) * 100;
-  selectedColors.children[index].querySelector("#percent").innerHTML = ((count / arrayData.length) * 100).toFixed(3);
+  variable.percent = count;
+  selectedColors.children[index].querySelector("#percent").innerHTML = count;
   selectedColors.children[index].querySelector("#phaseName").innerHTML = variable.phaseName;
   redrawPixels.redrawed = true;
 }
