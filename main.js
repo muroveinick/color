@@ -23,7 +23,7 @@ function calculate(isFirstRender) {
     canv.addEventListener("click", (e) => showColor(e.offsetX, e.offsetY, true));
     document.getElementById("calculate").addEventListener("click", () => redrawPixels(globalState.selectedRow));
     document.getElementById("clear").addEventListener("click", () => clearSelectedColors());
-    dragndrop(document.querySelector('[class*="dragheader"]'));
+    dragndrop(document.querySelector("#dragheader"));
   }
 }
 
@@ -95,7 +95,7 @@ function redrawPixels(index) {
     calculate(false);
   }
 
-  console.log(globalState.selectedRow);
+  // console.log(globalState.selectedRow);
   let variable = arrayOfColors[index];
   variable.set(document.querySelector("input#delta").value, document.querySelector("input#phaseNameInput").value);
   console.log(globalState.selectedRow);
@@ -118,7 +118,30 @@ function redrawPixels(index) {
   variable.percent = count;
   selectedColors.children[index].querySelector("#percent").innerHTML = count;
   selectedColors.children[index].querySelector("#phaseName").innerHTML = variable.phaseName;
+
+  document.querySelector("#sum").innerHTML = `Всего пикселей ${arrayData.length}, current px ${(c = arrayOfColors.reduce((acc, i) => {
+    acc += i.percent;
+    return acc;
+  }, 0))} current % ${((c / arrayData.length) * 100).toFixed(1)}`;
   redrawPixels.redrawed = true;
+}
+
+function drawAll() {
+  console.log("asdeqw");
+  arrayOfColors.forEach((i, j) => {
+    let count = 0;
+    let canvas = document.getElementById("canv");
+    let ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#fd02bf";
+
+    for (let k = 0; k < arrayData.length; k++) {
+      let currColor = arrayData[k].split(",");
+      if (((+currColor[0] - +i.colorArr[0]) ** 2 + (+currColor[1] - +i.colorArr[1]) ** 2 + (+currColor[2] - +i.colorArr[2]) ** 2) ** 0.5 < i.delta) {
+        ctx.fillRect(k % data.width, k / data.width, 1, 1);
+        count++;
+      }
+    }
+  });
 }
 
 function clearSelectedColors() {

@@ -133,7 +133,7 @@ input:focus {
   border-radius: 3px;
 }
 
-.dragheader {
+#dragheader {
   padding: 10px;
   text-align: center;
   cursor: move;

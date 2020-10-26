@@ -12,7 +12,7 @@ let colorObj = (obj) => `<div class="flex">
                             <label>Разброс: </label>
                             <span id="phaseName" style="min-width: 20px">${obj.delta}</span>
                             <button style="font-size: 12px;" class="edit">&#9998;</button>
-                            <button style="background: red" class="cancel">&#215;</button>
+                            <button style="background: red; font-size: 13px;" class="cancel">&#215;</button>
                           </div>`;
 colorData = class {
   constructor(color, id) {
