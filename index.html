@@ -1,51 +1,44 @@
 <html>
-  <head>
-    <link rel="icon" type="image/svg+xml" href="./favicon.ico" />
-    <link href="style.css" type="text/css" rel="stylesheet" />
-  </head>
 
-  <body>
-    <!-- <div class="header"></div> -->
-    <div class="main">
-      <div class="leftItem">
-        <button onclick="drawAll()">draw all</button>
-        <button onclick="onCreateRow()">Output</button>
-        <!-- <button onclick="console.log(arrayData.length)">всего писклекй</button> -->
-        <input type="file" id="file" onchange="uploadImage(this.files)" />
-        <label for="file">Upload</label>
-        <button id="calculate" disabled>Calculate</button>
-        <input id="delta" class="hidden" type="text" placeholder="Разбос" autocomplete="off" />
-        <!-- <label for="delta" class="hidden placeholder">Разбос</label> -->
-        <input id="phaseNameInput" class="hidden" type="text" placeholder="Название фазы" autocomplete="off" />
-        <button id="clear" disabled>clear</button>
-        <div class="colorData">
-          <label>координаты:</label>
-          <span id="coord"></span>
+<head>
+  <link rel="icon" type="image/svg+xml" href="./favicon.ico" />
+  <link href="style.css" type="text/css" rel="stylesheet" />
+</head>
 
-          <label> цвет rgba:</label>
-          <span id="rgba"></span>
+<body>
+  <!-- <div class="header"></div> -->
+  <div class="main">
+    <div class="leftItem">
+      <button onclick="drawAll()">draw all</button>
+      <!-- <button onclick="redrawModal()">Output</button> -->
+      <input type="file" id="file" onchange="uploadImage(this.files)" />
+      <label for="file">Upload</label>
+      <!-- <button id="clear">clear</button> -->
+      <div class="colorData">
+        <label>координаты:</label>
+        <span id="coord"></span>
 
-          <div class="output2"></div>
-        </div>
-      </div>
+        <label> цвет rgba:</label>
+        <span id="rgba"></span>
 
-      <div class="centeritem">
-        <img src="" />
-        <canvas id="canv"></canvas>
-      </div>
-
-      <div class="drag hidden">
-        <div id="dragheader">Выбранные цвета</div>
-        <div class="selectedColors"> </div>
-        <div id="sum"></div>
-
-        <!-- <div class="flex"><input type="range" min="0" max="255" value="50" id="r" /><label for="r">r</label></div> -->
-        <!-- <div class="flex"><input type="range" min="0" max="255" value="50" id="g" /><label for="g">g</label></div> -->
-        <!-- <div class="flex"><input type="range" min="0" max="255" value="50" id="b" /><label for="b">b</label></div>   -->
+        <div class="output2"></div>
       </div>
     </div>
-  </body>
 
-  <script src="./_var.js" type="text/javascript"></script>
-  <script src="./main.js" type="text/javascript"></script>
+    <div class="centeritem">
+      <img src="" />
+      <canvas id="canv"></canvas>
+    </div>
+
+    <div class="drag hidden">
+      <div id="dragheader">Выбранные цвета</div>
+      <div class="selectedColors"> </div>
+      <div id="sum"></div>
+    </div>
+  </div>
+</body>
+
+<script src="./_var.js" type="text/javascript"></script>
+<script src="./main.js" type="text/javascript"></script>
+
 </html>

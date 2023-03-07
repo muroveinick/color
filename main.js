@@ -1,3 +1,8 @@
+const canvas = document.getElementById("canv");
+HTMLCollection.prototype.forEach = Array.prototype.forEach;
+_mouse_pressed = false;
+
+
 function uploadImage(a) {
   let img = document.querySelector("img");
   img.src = URL.createObjectURL(a[0]);
@@ -6,24 +11,33 @@ function uploadImage(a) {
 }
 
 function calculate(isFirstRender) {
-  let canv = document.getElementById("canv");
   let img = document.querySelector("img");
-  canv.width = img.width;
-  canv.height = img.height;
-  let qqq = canv.getContext("2d");
-  qqq.drawImage(img, 0, 0, img.width, img.height);
+  canvas.width = img.width;
+  canvas.height = img.height;
+  let context = canvas.getContext("2d", { willReadFrequently: true });
+  context.drawImage(img, 0, 0, img.width, img.height);
 
   img.style.visibility = "hidden";
 
   if (isFirstRender) {
-    data = qqq.getImageData(0, 0, canv.width, canv.height);
-    getArrayOfColors(data.data);
+    const image_data = context.getImageData(0, 0, canvas.width, canvas.height);
+    getArrayOfColors(image_data.data);
 
-    canv.addEventListener("mousemove", (e) => showColor(e.offsetX, e.offsetY));
-    canv.addEventListener("click", (e) => showColor(e.offsetX, e.offsetY, true));
-    document.getElementById("calculate").addEventListener("click", () => redrawPixels(globalState.selectedRow));
-    document.getElementById("clear").addEventListener("click", () => clearSelectedColors());
-    dragndrop(document.querySelector("#dragheader"));
+    canvas.addEventListener("mousemove", (e) => showColor(e.offsetX, e.offsetY, image_data.width));
+    canvas.addEventListener("mousedown", (e) => _mouse_pressed = true);
+    canvas.addEventListener("mouseup", (e) => {
+      _mouse_pressed = false
+
+      const index = arrayOfColors.findIndex(el => el.selected);
+      if (index !== -1) {
+        const check = document.querySelector(`#lasso${index}`);
+        if (check.checked) return
+      }
+
+      addSquereWPickedColor(e.offsetX, e.offsetY, image_data.width);
+    });
+
+    dragndrop(drag);
   }
 }
 
@@ -44,8 +58,8 @@ function dragndrop(elem) {
   };
   function mousemove(e) {
     e.preventDefault();
-    drag.style.top = -coorddata.yNew + coorddata.yDef + e.clientY + "px";
-    drag.style.left = -coorddata.xNew + coorddata.xDef + e.clientX + "px";
+    elem.style.top = -coorddata.yNew + coorddata.yDef + e.clientY + "px";
+    elem.style.left = -coorddata.xNew + coorddata.xDef + e.clientX + "px";
   }
   function closedrag() {
     document.onmouseup = null;
@@ -53,14 +67,13 @@ function dragndrop(elem) {
   }
 }
 
-function showColor(x, y, isClicked) {
-  document.getElementById("coord").innerHTML = `${x}  ${y}`;
-  document.getElementById("rgba").innerHTML = arrayData[y * data.width + x];
-  document.querySelector('[class="output2"]').style.backgroundColor = `rgb(${arrayData[y * data.width + x]})`;
+function showColor(x, y, width) {
+  document.getElementById("coord").innerHTML = `${x}  ${y} ${_mouse_pressed}`;
+  document.getElementById("rgba").innerHTML = arrayData[y * width + x];
+  document.querySelector('[class="output2"]').style.backgroundColor = `rgb(${arrayData[y * width + x]})`;
 
-  if (isClicked) {
-    addSquereWPickedColor(x, y);
-  }
+  if (_mouse_pressed)
+    addLassoPixels()
 }
 
 function getArrayOfColors(array4) {
@@ -71,100 +84,73 @@ function getArrayOfColors(array4) {
   }
 }
 
-function enableContolsOnInput() {
-  drag.classList.remove("hidden");
-  document.querySelector("#delta").classList.remove("hidden");
-  document.querySelector("#phaseNameInput").classList.remove("hidden");
-
-  disableButtonById("clear", false);
-  disableButtonById("calculate", false);
+function addSquereWPickedColor(x, y, width) {
+  arrayOfColors.push(new colorData(arrayData[y * width + x], arrayOfColors.length));
+  redrawModal();
 }
 
-function addSquereWPickedColor(x, y) {
-  // if (globalState.rowCount > 2) return;
-
-  arrayOfColors.push(new colorData(arrayData[y * data.width + x], globalState.rowCount));
-  globalState.rowCount++;
-  onCreateRow();
-  enableContolsOnInput();
-}
-
-function redrawPixels(index) {
+function redrawPixels() {
   if (redrawPixels.redrawed) {
     redrawPixels.redrawed = false;
     calculate(false);
   }
 
-  // console.log(globalState.selectedRow);
-  let variable = arrayOfColors[index];
-  variable.set(document.querySelector("input#delta").value, document.querySelector("input#phaseNameInput").value);
-  console.log(globalState.selectedRow);
-  let count = 0;
-  let canvas = document.getElementById("canv");
+  const index = arrayOfColors.findIndex((el) => el.selected);
+  if (index === -1) return;
+
+  const currElem = arrayOfColors[index];
+  const count = markInPurple(currElem);
+
+  currElem.percent = ((count / arrayData.length) * 100).toFixed(2);
+
+  // document.querySelector("#sum").innerHTML = `Всего пикселей ${arrayData.length}, current px ${(c = arrayOfColors.reduce((acc, i) => {
+  //   acc += i.percent;
+  //   return acc;
+  // }, 0))} current % ${((c / arrayData.length) * 100).toFixed(1)}`;
+
+  redrawPixels.redrawed = true;
+  redrawModal();
+}
+
+drawAll = () => arrayOfColors.forEach(colorElem => markInPurple(colorElem));
+
+markInPurple = (colorElem) => {
   let ctx = canvas.getContext("2d");
   ctx.fillStyle = "#fd02bf";
 
-  for (let i = 0; i < arrayData.length; i++) {
-    let currColor = arrayData[i].split(",");
-    if (
-      ((+currColor[0] - +variable.colorArr[0]) ** 2 + (+currColor[1] - +variable.colorArr[1]) ** 2 + (+currColor[2] - +variable.colorArr[2]) ** 2) **
-        0.5 <
-      variable.delta
-    ) {
-      ctx.fillRect(i % data.width, i / data.width, 1, 1);
-      count++;
-    }
-  }
-  variable.percent = count;
-  selectedColors.children[index].querySelector("#percent").innerHTML = count;
-  selectedColors.children[index].querySelector("#phaseName").innerHTML = variable.phaseName;
 
-  document.querySelector("#sum").innerHTML = `Всего пикселей ${arrayData.length}, current px ${(c = arrayOfColors.reduce((acc, i) => {
-    acc += i.percent;
-    return acc;
-  }, 0))} current % ${((c / arrayData.length) * 100).toFixed(1)}`;
-  redrawPixels.redrawed = true;
-}
-
-function drawAll() {
-  console.log("asdeqw");
-  arrayOfColors.forEach((i, j) => {
-    let count = 0;
-    let canvas = document.getElementById("canv");
-    let ctx = canvas.getContext("2d");
-    ctx.fillStyle = "#fd02bf";
-
-    for (let k = 0; k < arrayData.length; k++) {
-      let currColor = arrayData[k].split(",");
-      if (((+currColor[0] - +i.colorArr[0]) ** 2 + (+currColor[1] - +i.colorArr[1]) ** 2 + (+currColor[2] - +i.colorArr[2]) ** 2) ** 0.5 < i.delta) {
-        ctx.fillRect(k % data.width, k / data.width, 1, 1);
-        count++;
+  if (!colorElem.pixelIndexes.length)
+    for (let i = 0; i < arrayData.length; i++) {
+      let currColor = arrayData[i].split(",");
+      if (((+currColor[0] - +colorElem.colorArr[0]) ** 2 + (+currColor[1] - +colorElem.colorArr[1]) ** 2 + (+currColor[2] - +colorElem.colorArr[2]) ** 2) ** 0.5 < colorElem.delta) {
+        ctx.fillRect(i % data.width, i / data.width, 1, 1);
+        colorElem.pixelIndexes.add(i)
       }
     }
-  });
-}
 
-function clearSelectedColors() {
-  disableButtonById("clear", true);
-  disableButtonById("calculate", true);
-  document.querySelector("#delta").classList.add("hidden");
-  document.querySelector("#phaseNameInput").classList.add("hidden");
-  drag.classList.add("hidden");
+  else
+    [...colorElem.pixelIndexes].forEach(index => {
+      ctx.fillRect(index % data.width, index / data.width, 1, 1);
+    })
 
-  return redrawPixels.redrawed ? (calculate(false), (redrawPixels.redrawed = false)) : null;
+  return colorElem.pixelIndexes.size
 }
 
 function disableButtonById(name, state) {
   document.getElementById(`${name}`).disabled = state;
 }
 
-function onCreateRow() {
-  HTMLCollection.prototype.forEach = Array.prototype.forEach;
-
+function redrawModal() {
   ///////перерисовываем выбранные точки
   selectedColors.innerHTML = "";
-  arrayOfColors.forEach((i) => selectedColors.insertAdjacentHTML("beforeend", colorObj(i)));
-  if (globalState.rowCount) drag.classList.remove("hidden");
+
+  arrayOfColors.forEach((el, index) => {
+    el.selected = false;
+    const tmp = colorObj(el, index);
+    selectedColors.insertAdjacentHTML("beforeend", tmp);
+  });
+
+  if (arrayOfColors.length) drag.classList.remove("hidden");
 
   selectedColors.children.forEach((i, j) => {
     ///на кнопку x
@@ -173,25 +159,26 @@ function onCreateRow() {
       if (res) {
         arrayOfColors.splice(j, 1);
         selectedColors.removeChild(i);
-        globalState.rowCount--;
-        // console.log(globalState.rowCount);
-        if (globalState.rowCount == 0) drag.classList.add("hidden");
-        onCreateRow();
+        if (arrayOfColors.length === 0) drag.classList.add("hidden");
+        redrawModal();
       }
-    });
-
-    i.querySelector(".edit").addEventListener("click", () => {
-      enableContolsOnInput();
     });
 
     ///на сам ряд
     i.addEventListener("click", () => {
-      selectedColors.children.forEach((k) => (k.classList.contains("selected") ? k.classList.remove("selected") : null));
-      i.classList.toggle("selected");
-      globalState.selectedRow = j;
+      selectedColors.children.forEach(k => k.classList.remove("selected"));
 
-      document.querySelector("#delta").value = arrayOfColors[j].delta || 0;
-      document.querySelector("#phaseNameInput").value = arrayOfColors[j].phaseName || "";
+      i.classList.toggle("selected");
+      arrayOfColors.forEach((elem, index) => elem.selected = index === j ? true : false)
     });
   });
+}
+
+
+function addLassoPixels() {
+  const index = arrayOfColors.findIndex((el) => el.selected);
+  if (index === -1) return;
+
+  // console.log(`lasso${index}`);
+  // console.log(document.querySelector(`#lasso${index}`).checked);
 }

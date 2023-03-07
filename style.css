@@ -1,5 +1,6 @@
 * {
   --primaty-color: #3f6bc0;
+  --slider_height: 23px;
   font-size: 2vmin;
 }
 
@@ -62,6 +63,14 @@ img {
   cursor: pointer;
   display: inline-block;
 }
+.selectedColors button {
+  font-size: 20px;
+  background: none;
+  padding: 0;
+  margin: 0;
+  color: var(--primaty-color);
+}
+
 .colorData {
   position: sticky;
   top: 10px;
@@ -99,6 +108,7 @@ button:disabled {
 button:focus {
   outline: 2px solid rgb(177, 222, 236);
 }
+
 .hidden {
   visibility: hidden;
   height: 0px;
@@ -160,10 +170,63 @@ input:focus {
   /* width: 50px; */
 }
 .flex *:nth-child(5) {
-  background-color: aqua;
+  /* background-color: aqua; */
   flex: 1 1 70px;
 }
 
 .selectedColors {
   padding: 2px;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: calc(var(--slider_height) - 8px);
+  width: calc(var(--slider_height) - 8px);
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: #2196f3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196f3;
+}
+input:checked + .slider:before {
+  transform: translateX(calc(var(--slider_height) - 8px));
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: calc(2 * var(--slider_height) - 8px);
+  height: var(--slider_height);
+}
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider.round {
+  border-radius: var(--slider_height);
+}
+.slider.round:before {
+  border-radius: 50%;
 }
