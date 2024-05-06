@@ -1,6 +1,7 @@
 const canvas = document.getElementById("canv");
 HTMLCollection.prototype.forEach = Array.prototype.forEach;
 _mouse_pressed = false;
+image_datas = null;
 
 
 function uploadImage(a) {
@@ -20,7 +21,7 @@ function calculate(isFirstRender) {
   img.style.visibility = "hidden";
 
   if (isFirstRender) {
-    const image_data = context.getImageData(0, 0, canvas.width, canvas.height);
+    image_data = context.getImageData(0, 0, canvas.width, canvas.height);
     getArrayOfColors(image_data.data);
 
     canvas.addEventListener("mousemove", (e) => showColor(e.offsetX, e.offsetY, image_data.width));
@@ -123,14 +124,14 @@ markInPurple = (colorElem) => {
     for (let i = 0; i < arrayData.length; i++) {
       let currColor = arrayData[i].split(",");
       if (((+currColor[0] - +colorElem.colorArr[0]) ** 2 + (+currColor[1] - +colorElem.colorArr[1]) ** 2 + (+currColor[2] - +colorElem.colorArr[2]) ** 2) ** 0.5 < colorElem.delta) {
-        ctx.fillRect(i % data.width, i / data.width, 1, 1);
+        ctx.fillRect(i % image_data.width, i / image_data.width, 1, 1);
         colorElem.pixelIndexes.add(i)
       }
     }
 
   else
     [...colorElem.pixelIndexes].forEach(index => {
-      ctx.fillRect(index % data.width, index / data.width, 1, 1);
+      ctx.fillRect(index % image_data.width, index / image_data.width, 1, 1);
     })
 
   return colorElem.pixelIndexes.size
